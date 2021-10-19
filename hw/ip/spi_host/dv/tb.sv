@@ -70,7 +70,8 @@ module tb;
     .cio_csb_en_o         (cio_csb_en_o),
     .cio_sd_o             (cio_sd_o),
     .cio_sd_en_o          (cio_sd_en_o),
-    .cio_sd_i             (cio_sd_i),
+    // TODO: Allow unknown input values once RTL assertions allow them.
+    .cio_sd_i             ($isunknown(cio_sd_i)?4'h0:cio_sd_i),
     // passthrough i/o
     .passthrough_i        (passthrough_i),
     .passthrough_o        (passthrough_o),
