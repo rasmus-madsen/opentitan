@@ -220,6 +220,8 @@ class pwm_scoreboard extends cip_base_scoreboard #(
     int high_cycles;
     int low_cycles;
 
+    string txt ="";
+
     if (channel_param[channel].BlinkEn) begin
       if (blink_cnt[channel] == 0) begin
         if (blink_state[channel] == CycleB) begin
@@ -240,11 +242,23 @@ class pwm_scoreboard extends cip_base_scoreboard #(
       int_dc = duty_cycle[channel].A;
     end
 
+    txt = $sformatf("channel %d", channel);
+    txt = $sformatf("%s \n blink_en %b",txt, channel_param[channel].BlinkEn);
+    txt = $sformatf("%s \n int DC %d", txt, int_dc);
+
+    `uvm_info(`gfn, $sformatf("%s", txt), UVM_LOW)
+     
+    `uvm_info(`gfn, $sformatf("MATHS"), UVM_LOW)
 
     beats_cycle = 2**(channel_cfg.DcResn+1);
+    `uvm_info(`gfn, $sformatf("beats_cycle %d", beats_cycle), UVM_LOW)
     period      = beats_cycle * (channel_cfg.ClkDiv + 1);
+        `uvm_info(`gfn, $sformatf("period: %d",period), UVM_LOW)
     high_cycles = (int_dc>>(16-(channel_cfg.DcResn+1)))*(channel_cfg.ClkDiv +1);
+    `uvm_info(`gfn, $sformatf("highcycles %d", high_cycles), UVM_LOW)
     low_cycles  = period - high_cycles;
+    txt = $sformatf(" dc %d shifted %d: %d",int_dc, 16-(channel_cfg.DcResn+1),(int_dc>>(16-(channel_cfg.DcResn+1))));
+    `uvm_info(`gfn, $sformatf("%s", txt), UVM_LOW)
 
     // ID
     item.monitor_id      = channel;
