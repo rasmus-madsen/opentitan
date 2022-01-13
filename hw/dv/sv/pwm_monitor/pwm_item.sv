@@ -28,7 +28,7 @@ class pwm_item extends uvm_sequence_item;
       string txt ="";
 
       txt = "\n------| PWM ITEM |------";
-      txt = { txt, $sformatf("\n Item from monitor %d", monitor_id) };
+      txt = { txt, $sformatf("\n Item from channel %d", monitor_id) };
       txt = { txt, $sformatf("\n Period %d clocks", period) };
       txt = { txt, $sformatf("\n Duty cycle %0d pct ", get_duty_cycle()) };
       txt = { txt, $sformatf("\n inverted %0b", invert) };

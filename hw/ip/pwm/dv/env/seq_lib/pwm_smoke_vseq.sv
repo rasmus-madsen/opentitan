@@ -34,23 +34,13 @@ class pwm_smoke_vseq extends pwm_base_vseq;
       cfg.blink[i].A           = 0;
       cfg.blink[i].B           = 0;
       cfg.pwm_param[i].BlinkEn = 0;
-    end
     
-  //     cfg.duty_cycle[1].A      = 'h8;
-   // cfg.duty_cycle[2].A      = 'h80;
-   // cfg.duty_cycle[3].A      = 'h800;
-   // cfg.duty_cycle[4].A      = 'h8000;    
-   //
-   // 
-   //
-      set_duty_cycle(0, cfg.duty_cycle[0]);
-     cfg.clk_rst_vif.wait_clks(10);
-   //     set_duty_cycle(0, cfg.duty_cycle[1]);
-   // set_duty_cycle(0, cfg.duty_cycle[2]);
-   // set_duty_cycle(0, cfg.duty_cycle[3]);
-   // set_duty_cycle(0, cfg.duty_cycle[4]);    
-      set_blink(0, cfg.blink[0]);
-      set_param(0, cfg.pwm_param[0]);
+      set_duty_cycle(i, cfg.duty_cycle[i]);
+      set_blink(i, cfg.blink[i]);
+      set_param(i, cfg.pwm_param[i]);
+   end
+                
+
 
     // enable channel 0
     set_ch_enables(32'h1);

@@ -196,9 +196,9 @@ class pwm_scoreboard extends cip_base_scoreboard #(
         // get next item and compare
         item_fifo[channel].get(input_item);
         if (! compare_item.compare(input_item)) begin
-          txt = "\n.......| Exp Item |.......";
+          txt = "\n\n.......| Exp Item |.......";
           txt = {txt, $sformatf("\n %s", compare_item.convert2string()) };
-          txt = { txt, "\n.......| Actual Item |......."};
+          txt = { txt, "\n\n\n.......| Actual Item |......."};
           txt = {txt, $sformatf("\n %s", input_item.convert2string()) };
           `uvm_fatal(`gfn, $sformatf("\n PWM pulse on Channel %d did not match %s", channel, txt ))
         end else begin

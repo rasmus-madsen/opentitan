@@ -5,10 +5,23 @@
 class pwm_env_cfg extends cip_base_env_cfg #(.RAL_T(pwm_reg_block));
   `uvm_object_utils_begin(pwm_env_cfg)
   `uvm_object_utils_end
-
   `uvm_object_new
 
-    // configs
+  // knobs //
+  int                   clk_div_min;
+  int                   clk_div_max;
+  int                   resn_min;
+  int                   resn_max;
+  int                   dc_min;
+  int                   dc_max;
+  int                   blink_min;
+  int                   blink_max;
+  int                   blink_pct;
+  int                   htbt_pct;
+  int                   phase_delay_min;
+  int                   phase_delay_max;
+
+  // configs
   pwm_monitor_cfg       m_pwm_monitor_cfg[PWM_NUM_CHANNELS];
 
   // virtual ifs
@@ -16,13 +29,49 @@ class pwm_env_cfg extends cip_base_env_cfg #(.RAL_T(pwm_reg_block));
   int                   core_clk_freq_mhz;
 
   // variables
-  cfg_reg_t             pwm_cfg;
-  dc_blink_t            duty_cycle[PWM_NUM_CHANNELS];
-  dc_blink_t            blink[PWM_NUM_CHANNELS];
-  param_reg_t           pwm_param[PWM_NUM_CHANNELS];
+  rand cfg_reg_t        pwm_cfg;
+  rand dc_blink_t       duty_cycle[PWM_NUM_CHANNELS];
+  rand dc_blink_t       blink[PWM_NUM_CHANNELS];
+  rand param_reg_t      pwm_param[PWM_NUM_CHANNELS];
   // ratio between bus_clk and core_clk (must be >= 1)
   rand int clk_ratio;
   constraint clk_ratio_c { clk_ratio inside {[1: 4]}; }
+
+
+  constraint pwm_cfg_c {
+      pwm_cfg.ClkDiv inside { [clk_div_min:clk_div_max] };
+      pwm_cfg.DcResn inside { [resn_min:resn_max] };
+      // force the counter enable to 0
+      // this should always be manually enabled
+      pwm_cfg.CntrEn == 0;
+  }
+
+  constraint dutycycle_c {
+        foreach (duty_cycle[ii]) {
+           duty_cycle[ii].A inside { [dc_min:dc_max] };
+           duty_cycle[ii].B inside { [dc_min:dc_max] };
+        }
+  }
+
+  constraint blink_c {
+        foreach (blink[ii]) {
+           blink[ii].A inside { [blink_min:blink_max] };
+           blink[ii].B inside { [blink_min:blink_max] };
+        }
+  }
+
+  constraint ch_param_c {
+        foreach (pwm_param[ii]) {
+          pwm_param[ii].BlinkEn dist { 1 :/ blink_pct,
+                                       0 :/ 100-blink_pct
+                                     };
+          pwm_param[ii].HtbtEn  dist { 1 :/ htbt_pct,
+                                       0 :/ 100 - htbt_pct
+                                     };
+          pwm_param[ii].PhaseDelay inside { [phase_delay_min:phase_delay_max] };
+        }
+  }
+  
 
   virtual function void initialize(bit [31:0] csr_base_addr = '1);
     list_of_alerts = pwm_env_pkg::LIST_OF_ALERTS;
@@ -43,8 +92,8 @@ class pwm_env_cfg extends cip_base_env_cfg #(.RAL_T(pwm_reg_block));
     int clk_core_min, clk_core_max, clk_core_mhz;
 
     if (en_random) begin
-      `DV_CHECK_MEMBER_RANDOMIZE_FATAL(clk_ratio)
-      `DV_CHECK_GE(clk_ratio, 1)
+//      `DV_CHECK_MEMBER_RANDOMIZE_FATAL(clk_ratio)
+//      `DV_CHECK_GE(clk_ratio, 1)
       clk_core_max = clk_rst_vif.clk_freq_mhz;
       clk_core_min = int'(clk_rst_vif.clk_freq_mhz / clk_ratio);
       clk_core_mhz = $urandom_range(clk_core_min, clk_core_max);
